@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package domain;
+
+option go_package = "github.com/meoconbatu/cmsgrpc/domain";
+
+import "github.com/meoconbatu/cmsgrpc/domain/proto-files/repository.proto";
+import "google/protobuf/empty.proto";
+
+service PageService {
+	rpc create(domain.Page) returns (CreatePageResponse);
+	rpc getOne(domain.GetOnePageRequest) returns (domain.Page);
+    rpc getAll(google.protobuf.Empty) returns (stream domain.Page);
+}
+
+message CreatePageResponse {
+	int64 createdPageId = 1;
+	Error error = 2;
+}
+message Error {
+	string code = 1;
+	string message = 2;
+}
+message GetOnePageRequest {
+    string id = 1;
+}
