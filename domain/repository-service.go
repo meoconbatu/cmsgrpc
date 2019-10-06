@@ -45,7 +45,7 @@ func (serviceImpl *PageServiceServerImpl) GetAll(req *empty.Empty, stream PageSe
 }
 
 // GetOne function
-func GetOne(ctx context.Context, req *GetOnePageRequest) (*Page, error) {
+func (serviceImpl *PageServiceServerImpl) GetOne(ctx context.Context, req *GetOnePageRequest) (*Page, error) {
 	page, err := GetPage(req.Id)
 	if err != nil {
 		return nil, err

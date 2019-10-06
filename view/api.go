@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/golang/protobuf/ptypes/empty"
+
 	"google.golang.org/grpc"
 )
 
@@ -36,7 +38,7 @@ func GetPages() ([]*Page, error) {
 	defer conn.Close()
 
 	client := NewPageServiceClient(conn)
-	stream, err := client.GetAll(context.Background(), nil)
+	stream, err := client.GetAll(context.Background(), &empty.Empty{})
 	if err != nil {
 		return nil, err
 	}

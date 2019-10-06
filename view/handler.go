@@ -7,7 +7,7 @@ import (
 )
 
 // Tmpl is a reference to all of our templates
-var Tmpl = template.Must(template.ParseGlob("templates/*"))
+var Tmpl = template.Must(template.ParseGlob("./view/templates/*"))
 
 // ServeIndex serve Index
 func ServeIndex(w http.ResponseWriter, r *http.Request) {

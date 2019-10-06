@@ -7,7 +7,7 @@
     <body>
         <h1>Latest Pages</h1>
         {{ range . }}
-            <h2><a href="/page/{{ .ID }}">{{ .Title }}</a></h2>
+            <h2><a href="/page/{{ .Id }}">{{ .Title }}</a></h2>
             <p>{{ .Content }}</p>
         {{ end }}
     </body>
