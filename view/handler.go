@@ -110,3 +110,21 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not supported:"+r.Method, http.StatusMethodNotAllowed)
 	}
 }
+
+// ServeLogin serves a login page
+func ServeLogin(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		Tmpl.ExecuteTemplate(w, "login", nil)
+	case "POST":
+		user := r.FormValue("user")
+		password := r.FormValue("password")
+		err := AuthenticateUser(user, password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		// users.SetSession(w, user)
+		w.Write([]byte("Signed in successfully"))
+	}
+}

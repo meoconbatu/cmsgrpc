@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var client PageServiceClient
+// var client PageServiceClient
 
 const serverAddress = "localhost:8080"
 
