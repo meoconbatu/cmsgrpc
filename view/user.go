@@ -2,6 +2,7 @@ package view
 
 import (
 	"context"
+	"errors"
 
 	"google.golang.org/grpc"
 )
@@ -17,12 +18,15 @@ func AuthenticateUser(username, password string) error {
 	defer conn.Close()
 
 	client := NewUserServiceClient(conn)
-	_, err = client.AuthenticateUser(context.Background(), &AuthenticateUserRequest{
+	resp, err := client.AuthenticateUser(context.Background(), &AuthenticateUserRequest{
 		UserName: username,
 		Password: password,
 	})
 	if err != nil {
 		return err
+	}
+	if resp.Error != nil {
+		return errors.New(resp.Error.Message)
 	}
 	return nil
 }

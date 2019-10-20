@@ -12,4 +12,9 @@ message AuthenticateUserRequest {
     string password = 2;
 }
 message AuthenticateUserResponse {
+	Error error = 1;
+}
+message Error {
+	string code = 1;
+	string message = 2;
 }

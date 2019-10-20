@@ -3,7 +3,7 @@ syntax = "proto3";
 package user;
 
 option go_package = "github.com/meoconbatu/cmsgrpc/view";
-
+import "github.com/meoconbatu/cmsgrpc/view/proto-files/repository-service.proto";
 service UserService {
     rpc AuthenticateUser(AuthenticateUserRequest) returns (AuthenticateUserResponse);
 }
@@ -12,4 +12,5 @@ message AuthenticateUserRequest {
     string password = 2;
 }
 message AuthenticateUserResponse {
+	domain.Error error = 1;
 }

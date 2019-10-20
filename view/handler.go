@@ -124,7 +124,7 @@ func ServeLogin(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		// users.SetSession(w, user)
+		SetSession(w, user)
 		w.Write([]byte("Signed in successfully"))
 	}
 }
