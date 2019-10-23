@@ -7,8 +7,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const serverUserAddress = "localhost:8090"
-
 // AuthenticateUser authenticate user
 func AuthenticateUser(username, password string) error {
 	conn, err := grpc.Dial(serverUserAddress, grpc.WithInsecure())

@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/meoconbatu/cmsgrpc/domain"
-
 	"google.golang.org/grpc"
 )
 
 func main() {
-	netListener := getNetListener(8080)
+	port := os.Getenv("PORT")
+	netListener := getNetListener(port)
 	gRPCServer := grpc.NewServer()
 	repositoryServiceImpl := domain.NewPageServiceServerImpl()
 	domain.RegisterPageServiceServer(gRPCServer, repositoryServiceImpl)
@@ -20,8 +22,8 @@ func main() {
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
-func getNetListener(port uint) net.Listener {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+func getNetListener(port string) net.Listener {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 		panic(fmt.Sprintf("failed to listen: %v", err))

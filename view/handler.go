@@ -3,11 +3,19 @@ package view
 import (
 	"html/template"
 	"net/http"
+	"os"
 	"strings"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // Tmpl is a reference to all of our templates
-var Tmpl = template.Must(template.ParseGlob("./view/templates/*"))
+var Tmpl = template.Must(template.ParseGlob("./templates/*"))
+
+var (
+	serverUserAddress = os.Getenv("USER_SERVER_URL")
+	serverAddress     = os.Getenv("DOMAIN_SERVER_URL")
+)
 
 // ServeIndex serve Index
 func ServeIndex(w http.ResponseWriter, r *http.Request) {

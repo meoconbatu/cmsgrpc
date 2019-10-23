@@ -1,2 +1,5 @@
 .vscode/*
-user/cmd/my.db
+my.db
+user/cmd/cmd
+domain/cmd/cmd
+view/cmd/cmd

@@ -9,10 +9,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// var client PageServiceClient
-
-const serverAddress = "localhost:8080"
-
 // CreatePage return PageServiceClient
 func CreatePage(p *Page) (int, error) {
 	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())

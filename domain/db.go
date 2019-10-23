@@ -2,7 +2,13 @@ package domain
 
 import (
 	"database/sql"
+	"log"
+	"os"
 
+	migrate "github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -14,7 +20,21 @@ type PgStore struct {
 }
 
 func newDB() *PgStore {
-	db, err := sql.Open("postgres", "user=cms dbname=cms sslmode=disable")
+	err := godotenv.Load()
+	if err != nil {
+		log.Print("Error loading .env file")
+	}
+	databaseURL := os.Getenv("DATABASE_URL")
+	sqlFiles := os.Getenv("DB_MIGRATIONS")
+
+	m, err := migrate.New(sqlFiles, databaseURL)
+	if err != nil {
+		panic(err)
+	}
+	if err := m.Up(); err != nil && err.Error() != "no change" {
+		panic(err)
+	}
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		panic(err)
 	}
