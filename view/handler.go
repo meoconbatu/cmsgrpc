@@ -133,7 +133,8 @@ func ServeLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		SetSession(w, user)
-		w.Write([]byte("Signed in successfully"))
+		// w.Write([]byte("Signed in successfully"))
+		http.Redirect(w, r, "/page/", http.StatusTemporaryRedirect)
 	}
 }
 
