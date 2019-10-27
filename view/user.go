@@ -28,3 +28,25 @@ func AuthenticateUser(username, password string) error {
 	}
 	return nil
 }
+
+// NewUser create new user
+func NewUser(username, password string) error {
+	conn, err := grpc.Dial(serverUserAddress, grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+
+	client := NewUserServiceClient(conn)
+	resp, err := client.NewUser(context.Background(), &User{
+		UserName: username,
+		Password: password,
+	})
+	if err != nil {
+		return err
+	}
+	if resp.Error != nil {
+		return errors.New(resp.Error.Message)
+	}
+	return nil
+}

@@ -136,3 +136,20 @@ func ServeLogin(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Signed in successfully"))
 	}
 }
+
+// ServeRegister serve a register page
+func ServeRegister(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		Tmpl.ExecuteTemplate(w, "register", nil)
+	case "POST":
+		user := r.FormValue("user")
+		password := r.FormValue("password")
+		err := NewUser(user, password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("New user created"))
+	}
+}

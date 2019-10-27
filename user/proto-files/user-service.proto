@@ -2,16 +2,23 @@ syntax = "proto3";
 
 package user;
 
+import "github.com/meoconbatu/cmsgrpc/user/proto-files/user.proto";
+
 option go_package = "github.com/meoconbatu/cmsgrpc/user";
+
 
 service UserService {
     rpc AuthenticateUser(AuthenticateUserRequest) returns (AuthenticateUserResponse);
+    rpc NewUser(user.User) returns (NewUserResponse);
 }
 message AuthenticateUserRequest {
     string userName = 1;
     string password = 2;
 }
 message AuthenticateUserResponse {
+	Error error = 1;
+}
+message NewUserResponse {
 	Error error = 1;
 }
 message Error {
