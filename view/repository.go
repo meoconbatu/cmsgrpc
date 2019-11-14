@@ -3,18 +3,30 @@ package view
 import (
 	"context"
 	"io"
+	"log"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
-// CreatePage return PageServiceClient
-func CreatePage(p *Page) (int, error) {
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+func createConnection() *grpc.ClientConn {
+	// Create the client TLS credentials
+	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "")
+	if err != nil {
+		log.Fatalf("could not load tls cert: %s", err)
+	}
+	conn, err := grpc.Dial(serverAddress, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		panic(err)
 	}
+	return conn
+}
+
+// CreatePage return PageServiceClient
+func CreatePage(p *Page) (int, error) {
+	conn := createConnection()
 	defer conn.Close()
 
 	client := NewPageServiceClient(conn)
@@ -27,10 +39,7 @@ func CreatePage(p *Page) (int, error) {
 
 // GetPages function
 func GetPages() ([]*Page, error) {
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
-	if err != nil {
-		panic(err)
-	}
+	conn := createConnection()
 	defer conn.Close()
 
 	client := NewPageServiceClient(conn)
@@ -54,10 +63,7 @@ func GetPages() ([]*Page, error) {
 
 // GetPage function
 func GetPage(id string) (*Page, error) {
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
-	if err != nil {
-		panic(err)
-	}
+	conn := createConnection()
 	defer conn.Close()
 
 	client := NewPageServiceClient(conn)
