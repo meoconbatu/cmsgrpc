@@ -6,11 +6,17 @@ option go_package = "github.com/meoconbatu/cmsgrpc/domain";
 
 import "github.com/meoconbatu/cmsgrpc/domain/proto-files/repository.proto";
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 service PageService {
 	rpc create(domain.Page) returns (CreatePageResponse);
 	rpc getOne(domain.GetOnePageRequest) returns (domain.Page);
-    rpc getAll(google.protobuf.Empty) returns (stream domain.Page);
+    rpc getAll(google.protobuf.Empty) returns (stream domain.Page) {
+		option (google.api.http) = {
+			post: "/page"
+			body: "*"
+		  };
+	};
 }
 
 message CreatePageResponse {

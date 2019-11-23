@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 
+	"context"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/meoconbatu/cmsgrpc/domain"
 	"google.golang.org/grpc"
@@ -13,10 +17,35 @@ import (
 )
 
 func main() {
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	netListener := getNetListener(host, port)
+	grpcAddress := os.Getenv("GRPC_ADDRESS")
+	restAddress := os.Getenv("REST_ADDRESS")
 
+	netListener := getNetListener(grpcAddress)
+	go func() {
+		err := startGRPCServer(netListener)
+		if err != nil {
+			log.Fatalf("failed to start gRPC server: %v", err)
+		}
+	}()
+
+	go func() {
+		err := startRESTServer(restAddress, fmt.Sprintf("%s:%s", grpcAddress))
+		if err != nil {
+			log.Fatalf("failed to start gRPC server: %v", err)
+		}
+	}()
+
+	select {}
+}
+func getNetListener(address string) net.Listener {
+	lis, err := net.Listen("tcp", address)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+		panic(fmt.Sprintf("failed to listen: %v", err))
+	}
+	return lis
+}
+func startGRPCServer(netListener net.Listener) error {
 	creds, err := credentials.NewServerTLSFromFile("cert/server.crt", "cert/server.key")
 	if err != nil {
 		log.Fatalf("could not load TLS keys: %s", err)
@@ -29,15 +58,31 @@ func main() {
 
 	domain.RegisterPageServiceServer(gRPCServer, repositoryServiceImpl)
 
+	log.Printf("starting HTTP/2 gRPC server on %s", netListener.Addr())
 	if err := gRPCServer.Serve(netListener); err != nil {
-		log.Fatalf("failed to serve: %s", err)
+		return fmt.Errorf("failed to serve: %s", err)
 	}
+	return nil
 }
-func getNetListener(host, port string) net.Listener {
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", host, port))
+func startRESTServer(address, grpcAddress string) error {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	creds, err := credentials.NewClientTLSFromFile("cert/server.crt", "")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-		panic(fmt.Sprintf("failed to listen: %v", err))
+		return fmt.Errorf("could not load TLS certificate: %s", err)
 	}
-	return lis
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(creds)}
+
+	mux := runtime.NewServeMux(runtime.WithDisablePathLengthFallback())
+
+	err = domain.RegisterPageServiceHandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	if err != nil {
+		return fmt.Errorf("could not register service domain: %s", err)
+	}
+	log.Printf("starting HTTP/1.1 REST server on %s", address)
+	http.ListenAndServe(address, mux)
+
+	return nil
 }
